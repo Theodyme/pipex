@@ -1,8 +1,38 @@
-#include <unistd.h>
 #include <stdio.h>
-#include <sys/wait.h>
-#include <sys/types.h>
+#include "pipex.h"
+#include "includes/library.h"
 
+int	main(int ac, char **av, char **env)
+{
+	int	pid;
+	int	i = 0;
+	int	fds[2];
+	int	status;
+
+	char **path;
+	char *bleh;
+	path = pathfinder(env);
+	bleh = pathbuilder(path, av[1]);
+
+	printf("%s\n", bleh);
+//	pipe(fds);
+//	pid = fork();
+//	if (pid == 0)
+//	{
+//		close(fds[0]);
+//		dup2(fds[1], 1);
+//		close(fds[1]);
+		execv(bleh, &av[1]);
+//	} else {
+//		close(fds[1]);
+///		dup2(fds[0], 0);
+//		close(fds[0]);
+//		execv(bleh, av);
+//	}
+//	printf("%s\n", bleh);
+	return (1);
+}
+/*
 typedef t_info {
 	int fdin;
 	int fdout;
@@ -12,7 +42,7 @@ typedef t_info {
 	char **paths;
 }	t_info;
 
-/* EXAMPLE WITH
+EXAMPLE WITH
 
 > ./pipex infile "grep o" "wc -w" outfile
 
@@ -44,12 +74,3 @@ needs:
 
 /!\ ajouter la gestion d'erreur !!
 */
-
-
-int	main(int ac, char **av, char **env)
-{
-		char *av[] = {"/bin/ls", NULL};
-		execve(av[0], av, 0);
-	}
-	return 0;
-}
