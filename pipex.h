@@ -4,30 +4,31 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include "utils.c"
-#include "pathfinder.c"
-#include "includes/ft_split.c"
-#include "includes/ft_strlcpy.c"
-#include "includes/ft_strlen.c"
 
-/*
-typedef struct t_cmds
+typedef struct t_bld
 {
+	char	*path[2];
+	char	**cmd[2];
+	char	**env;
 	int	fdin;
 	int	fdout;
-}	t_cmds
-*/
+}	t_bld;
 
+char	**cmdbuilder(char *arg);
 char	**ft_split(char const *s, char c);
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);
-int	ft_strlen(const char *str);
-
+char	**pathfinder(char **env);
 char	*pathbuilder(char **paths, char *cmdname);
 char	*pathcrasher(char *path, char *cmdname);
-char	**pathfinder(char **env);
 char	*strfinder(char **hay, char *needle);
+int	fdsbuilder(char **av, int n);
+int	ft_countwords(char const *s, char c);
+int	ft_getnxtlen(const char *s, char c);
+int	ft_strlen(const char *str);
+size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);
+void	*ft_free(char **tab, int words);
 void	ft_strcat(char *dst, char *src);
 
 

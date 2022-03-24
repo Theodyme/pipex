@@ -1,5 +1,4 @@
 #include "pipex.h"
-#include "includes/library.h"
 
 char	*pathcrasher(char *path, char *cmdname)
 {
@@ -11,8 +10,6 @@ char	*pathcrasher(char *path, char *cmdname)
 	ft_strcat(to_access, cmdname);
 	return (to_access);
 }
-
-
 
 char	*pathbuilder(char **paths, char *cmdname)
 {
@@ -33,8 +30,6 @@ char	*pathbuilder(char **paths, char *cmdname)
 	}
 	return (path);
 }
-
-
 
 char	**pathfinder(char **env)
 {
