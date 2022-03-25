@@ -4,8 +4,21 @@
 #include <fcntl.h>
 #include "pipex.h"
 
-void	childprocess(t_bld *s, int *pipe)
+void	buildfreer(t_bld *s)
 {
+        close(s->fdin);
+        close(s->fdout);
+        free(s->cmd[0]);
+        free(s->cmd[1]);
+        free(s->path[0]);
+        free(s->path[1]);
+	return ;
+}
+
+int	childprocess(t_bld *s, int *pipe)
+{
+	if (s->fdin == -1)
+		return (-1);
 	dup2(s->fdin, 0);
 	dup2(pipe[1], 1);
 	close(s->fdin);
@@ -13,7 +26,7 @@ void	childprocess(t_bld *s, int *pipe)
 	close(pipe[0]);
 	close(pipe[1]);
 	execve(s->path[0], &(s->cmd[0][0]), s->env);
-	return ;
+	return (-1);
 }
 
 void	parentprocess(t_bld *s, int *pipe)
@@ -45,32 +58,32 @@ void	launcher(t_bld *s)
 		waitpid(pid, &status, 0);
 		parentprocess(s, tuyau);
 	}
+	return ;
 }
 
 int	main(int ac, char **av, char **env)
 {
 	t_bld	s;
 
+	(void)ac;
 	if (!env[0])
 		return (0);
 	s.env = env;
 	s.fdin = fdsbuilder(av, 1);
 	s.fdout = fdsbuilder(av, 2);
+	if (!av[2][0] || !av[3][0] || (!av[2][0] && !av[3][0]))
+	{
+		write(0, "error: command not found.", 25);
+		close(s.fdin);
+		close(s.fdout);
+		return (0);
+	}
 	s.cmd[0] = cmdbuilder(av[2]);
 	s.cmd[1] = cmdbuilder(av[3]);
 	s.path[0] = pathbuilder(pathfinder(env), s.cmd[0][0]);
 	s.path[1] = pathbuilder(pathfinder(env), s.cmd[1][0]);
-/*	CHECKER DANS UN WHILE SUR LA STRUCTURE SI IL Y A UN NULL OU -1 ANYWHERE POUR RETURN UNE ERREUR;
-	if(s.cmd[1][0] == "ls")
-	{
-		dup2(s.fdout, 1);
-		close(s.fdin, s.fdout);
-		execve(s.path[1], s.cmd[1], env);
-		return (0);
-	}
-*/	launcher(&s);
-	close(s.fdin);
-	close(s.fdout);
+	launcher(&s);
+	buildfreer(&s);
 	return (0);
 }
 
@@ -85,7 +98,7 @@ int	main(int ac, char **av, char **env)
 	LEAKS HANDLING:
 	[ ] you need to free **env/paths= after building your 2nd command.
 	[x] you need to free every path you try to build if they fail.
-	[ ] you need to close any open fd if anything fail and stop the process.
+	[x] you need to close any open fd if anything fail and stop the process.
 	[ ] you need to free the struct at the potentiel end of the process if anything goes wrong.
 
 	WHICH VAR. WILL BE INSTANTIATED IN THE EXECUTIVE FUNCTION:
@@ -97,57 +110,13 @@ int	main(int ac, char **av, char **env)
 	int	errno;
 
 	SPECIFIC CASE TO HANDLE:
-	any command | ls:		only exec ls.
-	echo "hello world" -n:		prints "hello world" -n.
-	grep "o" -c:			prints the result and use the flag.
+	[x]	any command | ls:		only exec ls.
+	[x]	echo "hello world" -n:		prints "hello world" -n.
+	[x]	grep "o" -c:			prints the result and use the flag.
+	[x]					if infile can't be open, need to exec 2nd
+	[0]					if outfile can't be open, exec 1st
+	[x]					empty cmd
 
-
-
-
-	int	pid;
-	int	i = 0;
-	int	fdin;
-	int	fdout;
-	int	fds[2];
-	int	status;
-
-	char **path;
-	char *bleh;
-	char *blah;
-	char **cmd1;
-	char **cmd2;
-	cmd1 = cmdbuilder(av[2]);
-	cmd2 = cmdbuilder(av[3]);
-	path = pathfinder(env);
-	bleh = pathbuilder(path, cmd1[0]);
-	blah = pathbuilder(path, cmd2[0]);
-
-	fdin = fdsbuilder(av, 1);
-	fdout = fdsbuilder(av, 2);
-
-	printf("fdin: %d, fdout: %d\n", fdin, fdout);
-	printf("LES PATHS:\n%s\n%s\n", bleh, blah);
-	pipe(fds);
-	pid = fork();
-	if (pid == 0)
-	{
-		close(fds[0]);
-		dup2(fdin, 0);
-		close(fdin);
-		close(fdout);
-		dup2(fds[1], 1);
-		close(fds[1]);
-		execve(bleh, cmd1, env);
-	} else {
-		waitpid(pid, &status, 0);
-		close(fdin);
-		close(fds[1]);
-		dup2(fds[0], 0);
-		dup2(fdout, 1);
-		close(fdout);
-		close(fds[0]);
-		execve(blah, cmd2, env);
-	}
-	return (1);
-}
+	check leaks with:
+	valgrind --leak-check=full --show-leak-kinds=all --trace-children=yes
 */

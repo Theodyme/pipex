@@ -28,6 +28,7 @@ char	*pathbuilder(char **paths, char *cmdname)
 		free(path);
 		path = NULL;
 	}
+	
 	return (path);
 }
 
