@@ -1,24 +1,37 @@
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: flplace <flplace@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/26 18:56:35 by flplace           #+#    #+#             */
+/*   Updated: 2022/03/26 18:57:09 by flplace          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 void	buildfreer(t_bld *s)
 {
-        close(s->fdin);
-        close(s->fdout);
-        free(s->cmd[0]);
-        free(s->cmd[1]);
-        free(s->path[0]);
-        free(s->path[1]);
+	if (s->fdin != -1)
+		close(s->fdin);
+	if (s->fdout != -1)
+		close(s->fdout);
+	free_split(s->cmd[0]);
+	free_split(s->cmd[1]);
+	free(s->path[0]);
+	free(s->path[1]);
 	return ;
 }
 
 int	childprocess(t_bld *s, int *pipe)
 {
-	if (s->fdin == -1)
-		return (-1);
+	if (s->fdin == -1 || !(s->path[0]))
+	{
+		buildfreer(s);
+		exit(1);
+	}
 	dup2(s->fdin, 0);
 	dup2(pipe[1], 1);
 	close(s->fdin);
@@ -31,6 +44,8 @@ int	childprocess(t_bld *s, int *pipe)
 
 void	parentprocess(t_bld *s, int *pipe)
 {
+	if (!(s->path[1]))
+		return ;
 	dup2(pipe[0], 0);
 	dup2(s->fdout, 1);
 	close(s->fdin);
@@ -43,20 +58,27 @@ void	parentprocess(t_bld *s, int *pipe)
 
 void	launcher(t_bld *s)
 {
-	int	pid;
+	int	pid[2];
 	int	tuyau[2];
 	int	status;
 
-	pid = 1;
 	status = 0;
 	pipe(tuyau);
-	pid = fork();
-	if (pid == 0)
+	pid[0] = fork();
+	if (pid[0] == 0)
 	{
 		childprocess(s, tuyau);
-	} else {
-		waitpid(pid, &status, 0);
-		parentprocess(s, tuyau);
+	}
+	else
+	{
+		pid[1] = fork();
+		if (pid[1] == 0)
+			parentprocess(s, tuyau);
+		else
+		{
+			waitpid(pid[0], &status, 0);
+			waitpid(pid[1], &status, 0);
+		}
 	}
 	return ;
 }
@@ -65,8 +87,7 @@ int	main(int ac, char **av, char **env)
 {
 	t_bld	s;
 
-	(void)ac;
-	if (!env[0])
+	if (ac != 5 || !env[0])
 		return (0);
 	s.env = env;
 	s.fdin = fdsbuilder(av, 1);
@@ -78,12 +99,15 @@ int	main(int ac, char **av, char **env)
 		close(s.fdout);
 		return (0);
 	}
-	s.cmd[0] = cmdbuilder(av[2]);
-	s.cmd[1] = cmdbuilder(av[3]);
-	s.path[0] = pathbuilder(pathfinder(env), s.cmd[0][0]);
-	s.path[1] = pathbuilder(pathfinder(env), s.cmd[1][0]);
-	launcher(&s);
-	buildfreer(&s);
+	if (s.fdout >= 0)
+	{
+		s.cmd[0] = cmdbuilder(av[2]);
+		s.cmd[1] = cmdbuilder(av[3]);
+		s.path[0] = pathbuilder(pathfinder(env), s.cmd[0][0]);
+		s.path[1] = pathbuilder(pathfinder(env), s.cmd[1][0]);
+		launcher(&s);
+		buildfreer(&s);
+	}
 	return (0);
 }
 

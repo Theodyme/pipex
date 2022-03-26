@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: flplace <flplace@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/26 19:00:59 by flplace           #+#    #+#             */
+/*   Updated: 2022/03/26 19:01:31 by flplace          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stdlib.h>
 #include "pipex.h"
 
@@ -47,16 +59,29 @@ char	*strfinder(char **hay, char *needle)
 	int	j;
 
 	i = 0;
-	while(hay[i])
+	while (hay[i])
 	{
 		j = 0;
-		while(hay[i][j] == needle[j])
+		while (hay[i][j] == needle[j])
 		{
 			j++;
-			if(!needle[j])
+			if (!needle[j])
 				return (hay[i]);
 		}
 		i++;
 	}
 	return (NULL);
+}
+
+void	free_split(char **s)
+{
+	char	**tmp;
+
+	tmp = s;
+	while (*s)
+	{
+		free(*s);
+		s++;
+	}
+	free(tmp);
 }
