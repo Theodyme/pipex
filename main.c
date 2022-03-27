@@ -6,7 +6,7 @@
 /*   By: flplace <flplace@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/26 18:56:35 by flplace           #+#    #+#             */
-/*   Updated: 2022/03/26 18:57:09 by flplace          ###   ########.fr       */
+/*   Updated: 2022/03/27 15:54:22 by flplace          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,8 @@ void	launcher(t_bld *s)
 			parentprocess(s, tuyau);
 		else
 		{
+			close(tuyau[0]);
+			close(tuyau[1]);
 			waitpid(pid[0], &status, 0);
 			waitpid(pid[1], &status, 0);
 		}
@@ -110,37 +112,3 @@ int	main(int ac, char **av, char **env)
 	}
 	return (0);
 }
-
-/*
-
-	WHAT WE GLOBALLY NEED TO EXEC AND CAN BE STRUCTURED IN THE EXECUTIVE FUNCTION:
-	char	*path;			is the path after going through the pathfinder.c.
-	char	**cmd;			is the array containing the command and arguments after going through the cmdbuilder.
-	char	**env;			the env variable.
-	int	*fds;			is the array containing the INFILE and OUTFILE after going through the fdsbuilder.
-
-	LEAKS HANDLING:
-	[ ] you need to free **env/paths= after building your 2nd command.
-	[x] you need to free every path you try to build if they fail.
-	[x] you need to close any open fd if anything fail and stop the process.
-	[ ] you need to free the struct at the potentiel end of the process if anything goes wrong.
-
-	WHICH VAR. WILL BE INSTANTIATED IN THE EXECUTIVE FUNCTION:
-	int	pid;			will contain the pid.
-	int	*fds[2];		is the array containing the pipes entry & exit.
-	int	status;			will contain the status of waitpid(). NEEDS TO CHECK THE MODE AS WELL.
-
-	IF THE TIME LEFT ALLOWS IT, WHAT I MAY NEED IN THE STRUCTURE TO HANDLE ERROR CASES:
-	int	errno;
-
-	SPECIFIC CASE TO HANDLE:
-	[x]	any command | ls:		only exec ls.
-	[x]	echo "hello world" -n:		prints "hello world" -n.
-	[x]	grep "o" -c:			prints the result and use the flag.
-	[x]					if infile can't be open, need to exec 2nd
-	[0]					if outfile can't be open, exec 1st
-	[x]					empty cmd
-
-	check leaks with:
-	valgrind --leak-check=full --show-leak-kinds=all --trace-children=yes
-*/
