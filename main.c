@@ -45,8 +45,10 @@
 						fork and fd manipulation work, you should be good. You can also argue that your commands
 						are typed inside quotes, and that those cases will mess with how many arguments your
 						program will process.
-	[x]					if infile can't be open, you need to execute 2nd nonetheless.
-	[x]					if outfile can't be open, you need to execute 1st command nonetheless.
+	[x]					if infile can't be open (doesn't exist or you don't have the right permission), you need
+						to execute 2nd command nonetheless.
+	[x]					if outfile can't be open (wrong permission), you need to execute 1st command nonetheless.
+						It won't necessarily shows in the outfile, but it can be checked with commands like ls.
 	[x]					handle empty cmd.
 	[x]					you need to check if the **env parameter exists.
 	[x]					you need to check if you can actually find the line PATH= in the env parameter.
