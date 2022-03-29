@@ -13,6 +13,7 @@
 SRCS	=	main.c \
 			pathfinder.c \
 			utils.c \
+			utils_bis.c \
 			builders.c \
 			ft_split.c \
 

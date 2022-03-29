@@ -40,7 +40,9 @@ int		ft_countwords(char const *s, char c);
 int		ft_getnxtlen(const char *s, char c);
 int		ft_strlen(const char *str);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);
+void	*ft_calloc(size_t count, size_t size);
 void	*ft_free(char **tab, int words);
+void	*ft_memset(void *b, int c, size_t len);
 void	free_split(char **s);
 void	ft_strcat(char *dst, char *src);
 

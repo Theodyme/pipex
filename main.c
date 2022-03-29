@@ -6,7 +6,7 @@
 /*   By: flplace <flplace@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/26 18:56:35 by flplace           #+#    #+#             */
-/*   Updated: 2022/03/27 15:54:22 by flplace          ###   ########.fr       */
+/*   Updated: 2022/03/27 16:37:09 by flplace          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,16 @@ int	childprocess(t_bld *s, int *pipe)
 	if (s->fdin == -1 || !(s->path[0]))
 	{
 		buildfreer(s);
+		close(pipe[0]);
+		close(pipe[1]);
 		exit(1);
 	}
 	dup2(s->fdin, 0);
 	dup2(pipe[1], 1);
-	close(s->fdin);
-	close(s->fdout);
 	close(pipe[0]);
 	close(pipe[1]);
+	close(s->fdin);
+	close(s->fdout);
 	execve(s->path[0], &(s->cmd[0][0]), s->env);
 	return (-1);
 }
@@ -45,7 +47,11 @@ int	childprocess(t_bld *s, int *pipe)
 void	parentprocess(t_bld *s, int *pipe)
 {
 	if (!(s->path[1]))
+	{
+		close(pipe[1]);
+		close(pipe[0]);
 		return ;
+	}
 	dup2(pipe[0], 0);
 	dup2(s->fdout, 1);
 	close(s->fdin);
@@ -110,5 +116,6 @@ int	main(int ac, char **av, char **env)
 		launcher(&s);
 		buildfreer(&s);
 	}
+	close(s.fdin);
 	return (0);
 }

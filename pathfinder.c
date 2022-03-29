@@ -16,8 +16,7 @@ char	*pathcrasher(char *path, char *cmdname)
 {
 	char	*to_access;
 
-	to_access = (char *)calloc(sizeof(char),
-			ft_strlen(path) + ft_strlen(cmdname) + 2);
+	to_access = (char *)ft_calloc(sizeof(char), (ft_strlen(path) + ft_strlen(cmdname) + 2));
 	ft_strcat(to_access, path);
 	ft_strcat(to_access, "/");
 	ft_strcat(to_access, cmdname);
@@ -31,9 +30,11 @@ char	*pathbuilder(char **paths, char *cmdname)
 
 	i = 0;
 	path = NULL;
+	if (paths == NULL)
+		return (path);
 	if (access(cmdname, F_OK) == 0)
 	{
-		path = (char *)calloc(sizeof(char), (ft_strlen(cmdname) + 1));
+		path = (char *)ft_calloc(sizeof(char), (ft_strlen(cmdname) + 1));
 		free_split(paths);
 		ft_strcat(path, cmdname);
 		return (path);
