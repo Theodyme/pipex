@@ -19,7 +19,8 @@
 	char	**env;			the env variable.
 	int	*fds;			is the array containing the INFILE and OUTFILE fds after going through the fdsbuilder.
 
-	if you check that those parameters are valid before properly starting anything, you will barely have to worry about fd closing and variables that must be freed.
+	if you check that those parameters are valid before properly starting anything, you will barely have to worry about fd closing
+	and variables that must be freed.
 
 	LEAKS HANDLING:
 	[x] free **env/paths= after building your 2nd command.
@@ -40,12 +41,17 @@
 	[x]	any command | ls:		only executes ls.
 	[x]	echo "hello world" -n:		printsx "hello world" -n. (YOU DON'T HAVE TO HANDLE THIS CASE TO SUCCESS)
 	[x]	grep "o" -c:			prints the result and use the flag. (YOU DON'T HAVE TO HANDLE THIS CASE TO SUCCESS)
-						WHY ? First, because Pipex is not about parsing. As long as you understand how pipes, fork and fd manipulation work, you should be good. You can also argue that your commands are typed inside quotes, and that those cases will mess with how many arguments your program  will process.
+						WHY ? First, because Pipex is not about parsing. As long as you understand how pipes,
+						fork and fd manipulation work, you should be good. You can also argue that your commands
+						are typed inside quotes, and that those cases will mess with how many arguments your
+						program will process.
 	[x]					if infile can't be open, you need to execute 2nd nonetheless.
 	[x]					if outfile can't be open, you need to execute 1st command nonetheless.
 	[x]					handle empty cmd.
 	[x]					you need to check if the **env parameter exists.
-	[x]					you need to check if you can actually find the line PATH= in the env parameter. This will ensure your program won't segfault if you unset PATH in the shell before running Pipex.
+	[x]					you need to check if you can actually find the line PATH= in the env parameter.
+						This will ensure your program won't segfault if you unset PATH in the shell before
+						running Pipex.
 	[x]					handle wrong first cmd.
 	[x]					handle wrong second cmd.
 
@@ -110,8 +116,9 @@ void	parentprocess(t_bld *s, int *pipe)
 	return ;
 }
 
-//	LAUNCHER: will fork your program to execute each command in their own children. will pipe before that to ensure you have an accessible pipe to use to pass information between process.
-//	waitpid() is executed at the end of the two forks to ensure the handling of commands like sleep, for which it is important that the two commands start at the same time.
+//	LAUNCHER: will fork your program to execute each command in their own children. will pipe before that to ensure you have an
+//	accessible pipe to use to pass information between process. Waitpid() is executed at the end of the two forks to ensure the
+//	handling of commands like sleep, for which it is important that the two commands start at the same time.
 
 void	launcher(t_bld *s)
 {
