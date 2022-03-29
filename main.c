@@ -13,7 +13,7 @@
 #include "pipex.h"
 
 /*
-	WHAT WE GLOBALLY NEED TO EXEC AND CAN BE STRUCTURED IN THE EXECUTIVE FUNCTION:
+	WHAT WE GLOBALLY NEED TO EXEC AND CAN BE STRUCTURED IN THE MAIN FUNCTION:
 	char	*path;			is the path after going through the pathfinder.c.
 	char	**cmd;			is the array containing the command and arguments after going through the cmdbuilder.
 	char	**env;			the env variable.
@@ -39,8 +39,8 @@
 
 	SPECIFIC CASE TO HANDLE:
 	[x]	any command | ls:		only executes ls.
-	[x]	echo "hello world" -n:		printsx "hello world" -n. (YOU DON'T HAVE TO HANDLE THIS CASE TO SUCCESS)
-	[x]	grep "o" -c:			prints the result and use the flag. (YOU DON'T HAVE TO HANDLE THIS CASE TO SUCCESS)
+	[0]	echo "hello world" -n:		prints "hello world" -n. (YOU DON'T HAVE TO HANDLE THIS CASE TO SUCCESS)
+	[0]	grep "o" -c:			prints the result and use the flag. (YOU DON'T HAVE TO HANDLE THIS CASE TO SUCCESS)
 						WHY ? First, because Pipex is not about parsing. As long as you understand how pipes,
 						fork and fd manipulation work, you should be good. You can also argue that your commands
 						are typed inside quotes, and that those cases will mess with how many arguments your
